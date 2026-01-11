@@ -1,12 +1,14 @@
+import { Link } from 'react-router-dom';
+
 function Footer() {
   return <>
     <div className="container-fluid bg-white footer">
         <div className="container py-5">
             <div className="row g-5">
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
-                    <a href="index.html" className="d-inline-block mb-3">
+                    <Link to="/" className="d-inline-block mb-3">
                         <h1 className="text-primary">Hairnic</h1>
-                    </a>
+                    </Link>
                     <p className="mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat, nibh erat tempus risus, vitae porttitor purus nisl vitae purus.</p>
                 </div>
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
@@ -32,8 +34,8 @@ function Footer() {
                 </div>
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.7s">
                     <h5 className="mb-4">Popular Link</h5>
-                    <a className="btn btn-link" href="">About Us</a>
-                    <a className="btn btn-link" href="">Contact Us</a>
+                    <Link className="btn btn-link" to="/about">About Us</Link>
+                    <Link className="btn btn-link" to="/contact">Contact Us</Link>
                     <a className="btn btn-link" href="">Privacy Policy</a>
                     <a className="btn btn-link" href="">Terms & Condition</a>
                     <a className="btn btn-link" href="">Career</a>
@@ -49,7 +51,7 @@ function Footer() {
                     </div>
                     <div className="col-md-6 text-center text-md-end">
                         <div className="footer-menu">
-                            <a href="">Home</a>
+                            <Link to="/">Home</Link>
                             <a href="">Cookies</a>
                             <a href="">Help</a>
                             <a href="">FAQs</a>
