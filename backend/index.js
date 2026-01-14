@@ -2,6 +2,14 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
+import contactRoutes from './routes/contactRoutes.js';
+import faqRoutes from './routes/faqRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import categoryRoutes from './routes/categoryRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 
@@ -30,6 +38,15 @@ connectDB();
 app.get('/', (req, res) => {
     res.json({ message: 'API is running...' });
 });
+
+app.use('/api/contact', contactRoutes);
+app.use('/api/faq', faqRoutes);
+app.use('/api/auth', userRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/orders', orderRoutes);
 
 // Start Server
 app.listen(PORT, () => {
