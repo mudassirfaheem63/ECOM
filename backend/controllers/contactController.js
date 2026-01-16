@@ -1,4 +1,5 @@
 import { Contact } from '../models/database.js';
+import { sendContactResponseEmail, sendAdminContactNotification } from '../helpers/emailHelper.js';
 
 // Create a new contact message
 export const createContact = async (req, res) => {
@@ -16,6 +17,25 @@ export const createContact = async (req, res) => {
         });
 
         await contact.save();
+
+        // Send emails (don't block response if emails fail)
+        try {
+            // Send auto-response to user
+            await sendContactResponseEmail(email, name);
+
+            // Send notification to admin
+            await sendAdminContactNotification(
+                process.env.ADMIN_EMAIL || 'admin@example.com',
+                {
+                    name,
+                    email,
+                    message
+                }
+            );
+        } catch (emailError) {
+            console.error('Contact emails failed to send:', emailError);
+        }
+
         res.status(201).json({ message: 'Contact message sent successfully', contact });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });

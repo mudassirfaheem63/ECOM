@@ -10,6 +10,7 @@ import {
     getProductsByCategory
 } from '../controllers/productController.js';
 import { authenticate, authorize } from '../middlewares/auth.js';
+import { uploadProductImages } from '../helpers/uploadHelper.js';
 
 const router = express.Router();
 
@@ -19,9 +20,9 @@ router.get('/category/:categoryId', getProductsByCategory); // Get products by c
 router.get('/:id', getProduct);              // Get single product
 
 // Admin only routes
-router.post('/', authenticate, authorize('admin'), createProduct);        // Create product
+router.post('/', authenticate, authorize('admin'), uploadProductImages, createProduct);        // Create product
 router.get('/admin/all', authenticate, authorize('admin'), getAllProducts); // Get all products
-router.put('/:id', authenticate, authorize('admin'), updateProduct);      // Update product
+router.put('/:id', authenticate, authorize('admin'), uploadProductImages, updateProduct);      // Update product
 router.patch('/:id/toggle', authenticate, authorize('admin'), toggleProduct); // Toggle status
 router.delete('/:id', authenticate, authorize('admin'), deleteProduct);   // Delete product
 

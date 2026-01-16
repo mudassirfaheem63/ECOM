@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/database.js';
+import { sendWelcomeEmail } from '../helpers/emailHelper.js';
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -41,6 +42,13 @@ export const register = async (req, res) => {
 
         // Generate token
         const token = generateToken(user._id);
+
+        // Send welcome email (don't block registration if email fails)
+        try {
+            await sendWelcomeEmail(user.email, user.name);
+        } catch (emailError) {
+            console.error('Welcome email failed to send:', emailError);
+        }
 
         res.status(201).json({
             message: 'User registered successfully',

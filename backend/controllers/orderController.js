@@ -1,4 +1,5 @@
 import { Order, Product, Cart } from '../models/database.js';
+import { sendOrderConfirmationEmail, sendOrderStatusUpdateEmail } from '../helpers/emailHelper.js';
 
 // Create a new order
 export const createOrder = async (req, res) => {
@@ -87,6 +88,26 @@ export const createOrder = async (req, res) => {
                 select: 'name email'
             }
         ]);
+
+        // Send order confirmation email (don't block response if email fails)
+        try {
+            const orderDetails = {
+                orderNumber: order._id.toString().slice(-8).toUpperCase(),
+                orderDate: order.createdAt,
+                status: order.status,
+                paymentMethod: order.paymentMethod,
+                items: order.items.map(item => ({
+                    title: item.product.title,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                totalAmount: order.totalAmount
+            };
+
+            await sendOrderConfirmationEmail(order.user.email, order.user.name, orderDetails);
+        } catch (emailError) {
+            console.error('Order confirmation email failed to send:', emailError);
+        }
 
         res.status(201).json({
             message: 'Order created successfully',
@@ -265,6 +286,18 @@ export const updateOrderStatus = async (req, res) => {
                 select: 'name email'
             }
         ]);
+
+        // Send status update email (don't block response if email fails)
+        try {
+            await sendOrderStatusUpdateEmail(
+                order.user.email,
+                order.user.name,
+                order._id.toString().slice(-8).toUpperCase(),
+                status
+            );
+        } catch (emailError) {
+            console.error('Order status update email failed to send:', emailError);
+        }
 
         res.json({
             message: 'Order status updated successfully',

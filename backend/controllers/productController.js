@@ -1,9 +1,10 @@
 import { Product, Category } from '../models/database.js';
+import { generateImageUrls } from '../helpers/uploadHelper.js';
 
 // Create a new product
 export const createProduct = async (req, res) => {
     try {
-        const { title, description, price, stock, images, category } = req.body;
+        const { title, description, price, stock, category } = req.body;
 
         if (!title || !price || stock === undefined) {
             return res.status(400).json({ message: 'Title, price, and stock are required' });
@@ -21,12 +22,15 @@ export const createProduct = async (req, res) => {
             }
         }
 
+        // Generate image URLs from uploaded files
+        const imageUrls = generateImageUrls(req.files);
+
         const product = new Product({
             title,
             description,
             price,
             stock,
-            images: images || [],
+            images: imageUrls,
             category
         });
 
@@ -138,7 +142,7 @@ export const getProduct = async (req, res) => {
 // Update product
 export const updateProduct = async (req, res) => {
     try {
-        const { title, description, price, stock, images, category, isActive } = req.body;
+        const { title, description, price, stock, category, isActive } = req.body;
 
         // Validate price and stock if provided
         if (price !== undefined && price < 0) {
@@ -161,9 +165,14 @@ export const updateProduct = async (req, res) => {
         if (description !== undefined) updateData.description = description;
         if (price !== undefined) updateData.price = price;
         if (stock !== undefined) updateData.stock = stock;
-        if (images !== undefined) updateData.images = images;
         if (category !== undefined) updateData.category = category;
         if (isActive !== undefined) updateData.isActive = isActive;
+
+        // Handle image uploads - if new files uploaded, use them; otherwise keep existing
+        if (req.files && req.files.length > 0) {
+            const imageUrls = generateImageUrls(req.files);
+            updateData.images = imageUrls;
+        }
 
         const product = await Product.findByIdAndUpdate(
             req.params.id,
