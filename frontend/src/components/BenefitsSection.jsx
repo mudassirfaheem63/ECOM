@@ -46,7 +46,7 @@ function BenefitsSection() {
             </div>
           </div>
           <div className="col-lg-4 wow fadeIn" data-wow-delay="0.1s">
-            <img className="img-fluid animated pulse infinite" src="img/shampoo.png"/>
+            <img className="img-fluid animated pulse infinite" src="Hairnic/img/shampoo.png"/>
           </div>
           <div className="col-lg-4 wow fadeIn" data-wow-delay="0.5s">
             <div className="row g-5">

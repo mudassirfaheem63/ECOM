@@ -16,32 +16,32 @@ function Product() {
                     </div>
                     <div className="row g-4">
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
-                            <ProductItem image="img/product-1.png" name="Hair Shining Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-1.png" name="Hair Shining Shampoo" price="$99.99" />
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
-                            <ProductItem image="img/product-2.png" name="Anti-dandruff Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-2.png" name="Anti-dandruff Shampoo" price="$99.99" />
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.5s">
-                            <ProductItem image="img/product-1.png" name="Anti Hair Fall Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-1.png" name="Anti Hair Fall Shampoo" price="$99.99" />
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
-                            <ProductItem image="img/product-2.png" name="Hair Growing Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-2.png" name="Hair Growing Shampoo" price="$99.99" />
 
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
-                            <ProductItem image="img/product-1.png" name="Hair Shining Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-1.png" name="Hair Shining Shampoo" price="$99.99" />
 
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.5s">
-                            <ProductItem image="img/product-2.png" name="Anti-dandruff Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-2.png" name="Anti-dandruff Shampoo" price="$99.99" />
 
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
-                            <ProductItem image="img/product-1.png" name="Anti Hair Fall Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-1.png" name="Anti Hair Fall Shampoo" price="$99.99" />
 
                         </div>
                         <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
-                            <ProductItem image="img/product-2.png" name="Hair Growing Shampoo" price="$99.99" />
+                            <ProductItem image="Hairnic/img/product-2.png" name="Hair Growing Shampoo" price="$99.99" />
                         </div>
                         <div className="col-12 text-center">
                             <a className="btn btn-primary py-2 px-4" href="">Load More Products</a>

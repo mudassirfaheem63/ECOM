@@ -17,13 +17,13 @@ function Blog () {
             </div>
             <div className="row g-4">
                 <div className="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.1s">
-                    <BlogItem image="img/blog-1.jpg" title="Foods that are good for your hair growing" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
+                    <BlogItem image="Hairnic/img/blog-1.jpg" title="Foods that are good for your hair growing" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
                 </div>
                 <div className="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.3s">
-                    <BlogItem image="img/blog-2.jpg" title="How to take care of hair naturally" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
+                    <BlogItem image="Hairnic/img/blog-2.jpg" title="How to take care of hair naturally" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
                 </div>
                 <div className="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.5s">
-                    <BlogItem image="img/blog-3.jpg" title="How to use our natural & organic shampoo" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
+                    <BlogItem image="Hairnic/img/blog-3.jpg" title="How to use our natural & organic shampoo" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
                 </div>
             </div>
         </div>

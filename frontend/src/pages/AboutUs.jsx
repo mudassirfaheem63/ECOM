@@ -14,7 +14,7 @@ function AboutUs() {
         <div className="container">
             <div className="row g-5 align-items-center">
                 <div className="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
-                    <img className="img-fluid animated pulse infinite" src="img/shampoo-1.png" />
+                    <img className="img-fluid animated pulse infinite" src="Hairnic/img/shampoo-1.png" />
                 </div>
                 <div className="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
                     <h1 className="text-primary mb-4">Healthy Hair <span className="fw-light text-dark">Is A Symbol Of Our

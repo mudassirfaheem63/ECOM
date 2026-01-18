@@ -23,7 +23,7 @@ function Home() {
                     <a href="" className="btn btn-outline-dark py-2 px-4 animated slideInRight">Contact Us</a>
                 </div>
                 <div className="col-lg-6">
-                    <img className="img-fluid animated pulse infinite" src="img/shampoo.png" alt=""/>
+                    <img className="img-fluid animated pulse infinite" src="Hairnic/img/shampoo.png" alt=""/>
                 </div>
             </div>
         </div>
@@ -35,7 +35,7 @@ function Home() {
         <div className="container">
             <div className="row g-5 align-items-center">
                 <div className="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
-                    <img className="img-fluid animated pulse infinite" src="img/shampoo-1.png"/>
+                    <img className="img-fluid animated pulse infinite" src="Hairnic/img/shampoo-1.png"/>
                 </div>
                 <div className="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
                     <h1 className="text-primary mb-4">Healthy Hair <span className="fw-light text-dark">Is A Symbol Of Our
@@ -53,7 +53,7 @@ function Home() {
         <div className="container py-5">
             <div className="row g-5 align-items-center">
                 <div className="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
-                    <img className="img-fluid animated pulse infinite" src="img/shampoo-2.png"/>
+                    <img className="img-fluid animated pulse infinite" src="Hairnic/img/shampoo-2.png"/>
                 </div>
                 <div className="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
                     <div className="bg-white text-center p-4">
@@ -98,16 +98,16 @@ function Home() {
             </div>
             <div className="row g-4">
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
-                    <ProductItem image="img/product-1.png" name="Hair Shining Shampoo" price="$99.99" />
+                    <ProductItem image="Hairnic/img/product-1.png" name="Hair Shining Shampoo" price="$99.99" />
                 </div>
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
-                    <ProductItem image="img/product-2.png" name="Anti-dandruff Shampoo" price="$99.99" />
+                    <ProductItem image="Hairnic/img/product-2.png" name="Anti-dandruff Shampoo" price="$99.99" />
                 </div>
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.5s">
-                    <ProductItem image="img/product-1.png" name="Anti Hair Fall Shampoo" price="$99.99" />
+                    <ProductItem image="Hairnic/img/product-1.png" name="Anti Hair Fall Shampoo" price="$99.99" />
                 </div>
                 <div className="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.1s">
-                    <ProductItem image="img/product-2.png" name="Hair Growing Shampoo" price="$99.99" />
+                    <ProductItem image="Hairnic/img/product-2.png" name="Hair Growing Shampoo" price="$99.99" />
                 </div>
             </div>
         </div>
@@ -123,13 +123,13 @@ function Home() {
             </div>
             <div className="row g-4">
                 <div className="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.1s">
-                    <BlogItem image="img/blog-1.jpg" title="Foods that are good for your hair growing" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
+                    <BlogItem image="Hairnic/img/blog-1.jpg" title="Foods that are good for your hair growing" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
                 </div>
                 <div className="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.3s">
-                    <BlogItem image="img/blog-2.jpg" title="How to take care of hair naturally" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
+                    <BlogItem image="Hairnic/img/blog-2.jpg" title="How to take care of hair naturally" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
                 </div>
                 <div className="col-md-6 col-lg-4 wow fadeIn" data-wow-delay="0.5s">
-                    <BlogItem image="img/blog-3.jpg" title="How to use our natural & organic shampoo" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
+                    <BlogItem image="Hairnic/img/blog-3.jpg" title="How to use our natural & organic shampoo" excerpt="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquet, erat non malesuada consequat." />
                 </div>
             </div>
         </div>
