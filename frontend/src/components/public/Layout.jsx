@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import { useInjectedAssets } from './hooks/useInjectedAssets';
+import useInjectedAssets from '../../hooks/useInjectedAssets';
 import Header from './Header';
 import Footer from './Footer';
 

@@ -1,8 +1,56 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import HeroHeader from '../components/HeroHeader';
 import Newsletter from '../components/Newsletter';
 
+
 function ContactUs() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setSuccess('');
+    setError('');
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_Backend}/api/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      });
+
+      if (response.ok) {
+        setSuccess('Message sent successfully!');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        setError('Failed to send message. Please try again.');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      console.log (err)
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
        <>
      <HeroHeader title="Contact" />
@@ -48,39 +96,43 @@ function ContactUs() {
             <div className="row g-5">
                 <div className="col-lg-7 wow fadeIn" data-wow-delay="0.1s">
                     <h4 className="lh-base mb-4">Receive messages instantly with our PHP and Ajax contact form - available in the <a href="https://htmlcodex.com/downloading/?item=2727">Pro Version</a> only.</h4>
-                    <div className="wow fadeIn" data-wow-delay="0.3s">
-                        <form>
-                            <div className="row g-3">
-                                <div className="col-md-6">
-                                    <div className="form-floating">
-                                        <input type="text" className="form-control" id="name" placeholder="Your Name" />
-                                        <label for="name">Your Name</label>
-                                    </div>
-                                </div>
-                                <div className="col-md-6">
-                                    <div className="form-floating">
-                                        <input type="email" className="form-control" id="email" placeholder="Your Email" />
-                                        <label for="email">Your Email</label>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <div className="form-floating">
-                                        <input type="text" className="form-control" id="subject" placeholder="Subject" />
-                                        <label for="subject">Subject</label>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <div className="form-floating">
-                                        <textarea className="form-control" placeholder="Leave a message here" id="message" style={{height: '150px'}}></textarea>
-                                        <label for="message">Message</label>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <button className="btn btn-primary w-100 py-3" type="submit">Send Message</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                     <div className="wow fadeIn" data-wow-delay="0.3s">
+                         <form onSubmit={handleSubmit}>
+                             <div className="row g-3">
+                                 <div className="col-md-6">
+                                     <div className="form-floating">
+                                         <input type="text" className="form-control" id="name" placeholder="Your Name" value={formData.name} onChange={handleChange} required />
+                                         <label htmlFor="name">Your Name</label>
+                                     </div>
+                                 </div>
+                                 <div className="col-md-6">
+                                     <div className="form-floating">
+                                         <input type="email" className="form-control" id="email" placeholder="Your Email" value={formData.email} onChange={handleChange} required />
+                                         <label htmlFor="email">Your Email</label>
+                                     </div>
+                                 </div>
+                                 <div className="col-12">
+                                     <div className="form-floating">
+                                         <input type="text" className="form-control" id="subject" placeholder="Subject" value={formData.subject} onChange={handleChange} required />
+                                         <label htmlFor="subject">Subject</label>
+                                     </div>
+                                 </div>
+                                 <div className="col-12">
+                                     <div className="form-floating">
+                                         <textarea className="form-control" placeholder="Leave a message here" id="message" style={{height: '150px'}} value={formData.message} onChange={handleChange} required></textarea>
+                                         <label htmlFor="message">Message</label>
+                                     </div>
+                                 </div>
+                                 <div className="col-12">
+                                     <button className="btn btn-primary w-100 py-3" type="submit" disabled={loading}>
+                                       {loading ? 'Sending...' : 'Send Message'}
+                                     </button>
+                                 </div>
+                             </div>
+                             {success && <div className="alert alert-success mt-3">{success}</div>}
+                             {error && <div className="alert alert-danger mt-3">{error}</div>}
+                         </form>
+                     </div>
                 </div>
                 <div className="col-lg-5 wow fadeIn" data-wow-delay="0.5s">
                     <iframe className="w-100 h-100"
