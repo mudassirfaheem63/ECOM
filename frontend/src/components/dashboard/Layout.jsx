@@ -1,12 +1,12 @@
 import { Outlet } from "react-router-dom"
-import { useInjectedAssets } from './hooks/useInjectedAssets';
+import  useInjectedAssets from "../../hooks/useInjectedAssets";    
 import Footer from "./Footer"
 import Header from "./Header"
 import Sidebar from "./sidebar"
 
 
-function Layout() {
-    useInjectedAssets([
+function DashboardLayout() {
+    useInjectedAssets  ([
         'https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap',
         'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css',
         'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css',
@@ -70,4 +70,4 @@ function Layout() {
     )
 }
 
-export default Layout
+export default DashboardLayout
