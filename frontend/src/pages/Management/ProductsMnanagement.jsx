@@ -1,8 +1,11 @@
 // src/pages/admin/ProductsManagement.jsx
 import React, { useState, useEffect } from 'react';
+import { useAuth } from '../../contexts/Auth';
 
+const API_BASE = import.meta.env.VITE_Backend || 'http://localhost:5000';
 
 const ProductsManagement = () => {
+  const { logout } = useAuth();
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]); // for category dropdown
   const [modalOpen, setModalOpen] = useState(false);
@@ -26,19 +29,43 @@ const ProductsManagement = () => {
     fetchCategories();
   }, []);
 
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required. Please login again.');
+    }
+    return {
+      'Authorization': `Bearer ${token}`
+    };
+  };
+
+  const handleAuthError = (error) => {
+    if (error.message.includes('Authentication required') || 
+        error.message.includes('Unauthorized') ||
+        error.message.includes('Invalid token')) {
+      logout();
+      window.location.href = '/login';
+    }
+  };
+
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/products/admin/all', {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
+      const res = await fetch(`${API_BASE}/api/products/admin/all`, {
+        headers: getAuthHeaders(),
       });
+
+      if (res.status === 401 || res.status === 403) {
+        handleAuthError(new Error('Unauthorized'));
+        return;
+      }
+
       if (!res.ok) throw new Error('Failed to load products');
       const data = await res.json();
       setProducts(data);
     } catch (err) {
       setError(err.message);
+      handleAuthError(err);
     } finally {
       setLoading(false);
     }
@@ -46,15 +73,22 @@ const ProductsManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories/admin/all', {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+      const res = await fetch(`${API_BASE}/api/categories/admin/all`, {
+        headers: getAuthHeaders(),
       });
+
+      if (res.status === 401 || res.status === 403) {
+        handleAuthError(new Error('Unauthorized'));
+        return;
+      }
+
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
       }
     } catch (err) {
       console.warn('Categories fetch failed', err);
+      handleAuthError(err);
     }
   };
 
@@ -128,16 +162,19 @@ const ProductsManagement = () => {
       const method = modalMode === 'create' ? 'POST' : 'PUT';
       const url =
         modalMode === 'create'
-          ? '/api/products'
-          : `/api/products/${currentProduct._id}`;
+          ? `${API_BASE}/api/products`
+          : `${API_BASE}/api/products/${currentProduct._id}`;
 
       const res = await fetch(url, {
         method,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
-        },
+        headers: getAuthHeaders(),
         body: formData,
       });
+
+      if (res.status === 401 || res.status === 403) {
+        handleAuthError(new Error('Unauthorized'));
+        return;
+      }
 
       if (!res.ok) {
         const errData = await res.json();
@@ -148,6 +185,7 @@ const ProductsManagement = () => {
       fetchProducts();
     } catch (err) {
       setError(err.message);
+      handleAuthError(err);
     } finally {
       setLoading(false);
     }
@@ -156,14 +194,21 @@ const ProductsManagement = () => {
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
     try {
-      const res = await fetch(`/api/products/${id}`, {
+      const res = await fetch(`${API_BASE}/api/products/${id}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` },
+        headers: getAuthHeaders(),
       });
+
+      if (res.status === 401 || res.status === 403) {
+        handleAuthError(new Error('Unauthorized'));
+        return;
+      }
+
       if (!res.ok) throw new Error('Delete failed');
       fetchProducts();
     } catch (err) {
       alert('Error: ' + err.message);
+      handleAuthError(err);
     }
   };
 

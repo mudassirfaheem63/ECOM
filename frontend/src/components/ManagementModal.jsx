@@ -1,5 +1,9 @@
 // src/components/ManagementModal.jsx
 import React, { useState, useEffect } from 'react';
+
+// Get backend URL from environment variable
+const API_BASE = import.meta.env.VITE_Backend || 'http://localhost:5000';
+
 const ManagementModal = ({
     title,
     apiBase,
@@ -22,13 +26,44 @@ const ManagementModal = ({
     const fetchItems = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`/api/${apiBase}/admin/all`, {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            setError(null);
+
+            // Construct the URL based on apiBase
+            let url = `${API_BASE}/api/${apiBase}`;
+
+            // Add /admin/all for endpoints that have it, except 'auth'
+            if (apiBase !== 'auth') {
+                url += '/admin/all';
+            }
+
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('Authentication required. Please login again.');
+            }
+
+            const res = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
-            if (!res.ok) throw new Error('Failed to fetch');
+
+            if (!res.ok) {
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.message || `Failed to fetch: ${res.status}`);
+                } else {
+                    // This is the HTML error page
+                    throw new Error(`Server error: ${res.status}. Backend may not be running at ${API_BASE}`);
+                }
+            }
+
             const data = await res.json();
-            setItems(data);
+            setItems(Array.isArray(data) ? data : []);
         } catch (err) {
+            console.error('Fetch error:', err);
             setError(err.message);
         } finally {
             setLoading(false);
@@ -48,28 +83,42 @@ const ManagementModal = ({
 
         try {
             setLoading(true);
+            setError(null);
+
             const method = modalMode === 'create' ? 'POST' : 'PUT';
             const url = modalMode === 'create'
-                ? `/api/${apiBase}`
-                : `/api/${apiBase}/${currentItem._id}`;
+                ? `${API_BASE}/api/${apiBase}`
+                : `${API_BASE}/api/${apiBase}/${currentItem._id}`;
+
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('Authentication required. Please login again.');
+            }
 
             const res = await fetch(url, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    'Authorization': `Bearer ${token}`
                 },
                 body: JSON.stringify(currentItem)
             });
 
             if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.message || 'Operation failed');
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const errData = await res.json();
+                    throw new Error(errData.message || 'Operation failed');
+                } else {
+                    throw new Error(`Server error: ${res.status}`);
+                }
             }
 
             setShowModal(false);
-            fetchItems();
+            await fetchItems();
         } catch (err) {
+            console.error('Save error:', err);
             setError(err.message);
         } finally {
             setLoading(false);
@@ -77,14 +126,37 @@ const ManagementModal = ({
     };
 
     const handleDelete = async (id) => {
-        if (!window.confirm('Are you sure?')) return;
+        if (!window.confirm('Are you sure you want to delete this item?')) return;
+
         try {
-            await fetch(`/api/${apiBase}/${id}`, {
+            setError(null);
+            const token = localStorage.getItem('token');
+
+            if (!token) {
+                throw new Error('Authentication required. Please login again.');
+            }
+
+            const res = await fetch(`${API_BASE}/api/${apiBase}/${id}`, {
                 method: 'DELETE',
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
-            fetchItems();
+
+            if (!res.ok) {
+                const contentType = res.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    const errData = await res.json();
+                    throw new Error(errData.message || 'Delete failed');
+                } else {
+                    throw new Error(`Server error: ${res.status}`);
+                }
+            }
+
+            await fetchItems();
         } catch (err) {
+            console.error('Delete error:', err);
             alert('Delete failed: ' + err.message);
         }
     };
@@ -108,26 +180,44 @@ const ManagementModal = ({
                         </button>
                     </div>
 
-                    {loading && <div className="text-center my-4"><div className="spinner-border text-primary" role="status"></div></div>}
-                    {error && <div className="alert alert-danger">{error}</div>}
+                    {loading && (
+                        <div className="text-center my-4">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                    )}
 
-                    <div className="table-responsive">
-                        <table className="table text-start align-middle table-bordered table-hover mb-0">
-                            <thead>
-                                <tr className="text-dark">
-                                    {fields.map(f => <th key={f.name}>{f.label}</th>)}
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {items.map(item => renderTableRow(item, handleOpenModal, handleDelete))}
-                            </tbody>
-                        </table>
-                    </div>
+                    {error && (
+                        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+                            <strong>Error:</strong> {error}
+                            <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+                        </div>
+                    )}
+
+                    {!loading && items.length === 0 && !error && (
+                        <div className="alert alert-info">No items found. Click "Add New" to create one.</div>
+                    )}
+
+                    {!loading && items.length > 0 && (
+                        <div className="table-responsive">
+                            <table className="table text-start align-middle table-bordered table-hover mb-0">
+                                <thead>
+                                    <tr className="text-dark">
+                                        {fields.map(f => <th key={f.name}>{f.label}</th>)}
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {items.map(item => renderTableRow(item, handleOpenModal, handleDelete))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* ─── SINGLE MODAL ──────────────────────────────────────────────── */}
+            {/* MODAL */}
             <div className={`modal fade ${showModal ? 'show' : ''}`} style={{ display: showModal ? 'block' : 'none' }} tabIndex="-1">
                 <div className="modal-dialog modal-lg">
                     <div className="modal-content">
@@ -224,6 +314,12 @@ const ManagementModal = ({
                                 ))}
 
                                 {extraModalContent && extraModalContent(currentItem, handleChange, modalMode)}
+
+                                {error && (
+                                    <div className="alert alert-danger mt-3" role="alert">
+                                        {error}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="modal-footer">
@@ -232,7 +328,14 @@ const ManagementModal = ({
                                 </button>
                                 {modalMode !== 'view' && (
                                     <button type="submit" className="btn btn-primary" disabled={loading}>
-                                        {loading ? 'Saving...' : 'Save'}
+                                        {loading ? (
+                                            <>
+                                                <span className="spinner-border spinner-border-sm me-2"></span>
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            'Save'
+                                        )}
                                     </button>
                                 )}
                             </div>

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/Auth';
 import HeroHeader from '../components/HeroHeader';
 
-function Registar() {
+function Register() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -162,4 +162,4 @@ function Registar() {
   );
 }
 
-export default Registar;
+export default Register;

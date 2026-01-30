@@ -11,7 +11,7 @@ import Blog from "./pages/blog"
 import Error404 from "./pages/404"
 import Product from "./pages/product"
 import Login from "./pages/Login"
-import Registar from "./pages/Registar"
+import Register from "./pages/Register"
 import DashboardLayout from './components/dashboard/Layout';
 import ProductsManagement from './pages/Management/ProductsMnanagement'
 import CategoriesManagement from './pages/Management/CategoriesManagement'
@@ -19,6 +19,7 @@ import OrdersManagement from './pages/Management/OrdersManagement'
 import UsersManagement from './pages/Management/UsersManagement'
 import ContactsManagement from './pages/Management/ContactsManagement'
 import FAQsManagement from './pages/Management/FAQsManagement'
+import ProtectedRoute from './Protectedroutes';
 
 function App() {
   return (
@@ -36,16 +37,18 @@ function App() {
             <Route path="*" element={<Error404 />} />
             <Route path="product" element={<Product />} />
             <Route path="login" element={<Login />} />
-            <Route path="register" element={<Registar />} />
+            <Route path="register" element={<Register />} />
           </Route>
           <Route path="/" element={<DashboardLayout />} >
-          <Route path="dashboard/*" element={<div>Dashboard Home</div>} />
-            <Route path="Managementcategories" element={<CategoriesManagement/>} />
-            <Route path="Managementproducts" element={<ProductsManagement />} />
-          <Route path="Managementorders" element={<OrdersManagement />} />
-          <Route path="Managementusers" element={<UsersManagement />} />
-          <Route path="Managementcontact" element={<ContactsManagement />} />
-          <Route path="Managementfaq" element={<FAQsManagement />} />
+            <ProtectedRoute requireAdmin>
+            <Route path="dashboard/*" element={<div>Dashboard Home</div>} />
+            <Route path="managementcategories" element={<CategoriesManagement />} />
+            <Route path="managementproducts" element={<ProductsManagement />} />
+            <Route path="managementorders" element={<OrdersManagement />} />
+            <Route path="managementusers" element={<UsersManagement />} />
+            <Route path="managementcontact" element={<ContactsManagement />} />
+            <Route path="managementfaq" element={<FAQsManagement />} />
+            </ProtectedRoute>
           </Route>
         </Routes>
       </Router>
