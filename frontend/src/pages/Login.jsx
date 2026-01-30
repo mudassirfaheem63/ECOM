@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '../contexts/Auth';
+import { useAuth } from '../contexts/AuthContext';
 import HeroHeader from '../components/HeroHeader';
 
 function Login() {
@@ -8,9 +8,8 @@ function Login() {
     email: '',
     password: ''
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,22 +17,28 @@ function Login() {
       ...formData,
       [e.target.id]: e.target.value
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    // Client-side validation
+    if (!formData.email || !formData.password) {
+      setError('Please fill in all fields');
+      return;
+    }
 
     const result = await login(formData.email, formData.password);
 
     if (result.success) {
+      // Navigate to home page after successful login
       navigate('/');
     } else {
       setError(result.message);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -61,6 +66,7 @@ function Login() {
                           value={formData.email}
                           onChange={handleChange}
                           required
+                          disabled={loading}
                         />
                         <label htmlFor="email">Email Address</label>
                       </div>
@@ -75,10 +81,18 @@ function Login() {
                           value={formData.password}
                           onChange={handleChange}
                           required
+                          disabled={loading}
                         />
                         <label htmlFor="password">Password</label>
                       </div>
                     </div>
+                    
+                    {error && (
+                      <div className="col-12">
+                        <div className="alert alert-danger mb-0">{error}</div>
+                      </div>
+                    )}
+
                     <div className="col-12">
                       <button
                         className="btn btn-primary w-100 py-3"
@@ -97,9 +111,6 @@ function Login() {
                       </p>
                     </div>
                   </div>
-                  {error && (
-                    <div className="alert alert-danger mt-3">{error}</div>
-                  )}
                 </form>
               </div>
             </div>

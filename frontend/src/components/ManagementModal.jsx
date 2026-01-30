@@ -1,8 +1,6 @@
 // src/components/ManagementModal.jsx
 import React, { useState, useEffect } from 'react';
-
-// Get backend URL from environment variable
-const API_BASE = import.meta.env.VITE_Backend || 'http://localhost:5000';
+import { useAuth } from '../contexts/Auth';
 
 const ManagementModal = ({
     title,
@@ -12,6 +10,7 @@ const ManagementModal = ({
     renderTableRow,
     extraModalContent = null,
 }) => {
+    const { api } = useAuth();
     const [items, setItems] = useState([]);
     const [modalMode, setModalMode] = useState(null); // 'create' | 'edit' | 'view'
     const [currentItem, setCurrentItem] = useState(null);
@@ -29,42 +28,18 @@ const ManagementModal = ({
             setError(null);
 
             // Construct the URL based on apiBase
-            let url = `${API_BASE}/api/${apiBase}`;
+            let endpoint = `/api/${apiBase}`;
 
             // Add /admin/all for endpoints that have it, except 'auth'
             if (apiBase !== 'auth') {
-                url += '/admin/all';
+                endpoint += '/admin/all';
             }
 
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                throw new Error('Authentication required. Please login again.');
-            }
-
-            const res = await fetch(url, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!res.ok) {
-                const contentType = res.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.message || `Failed to fetch: ${res.status}`);
-                } else {
-                    // This is the HTML error page
-                    throw new Error(`Server error: ${res.status}. Backend may not be running at ${API_BASE}`);
-                }
-            }
-
-            const data = await res.json();
-            setItems(Array.isArray(data) ? data : []);
+            const response = await api.get(endpoint);
+            setItems(Array.isArray(response.data) ? response.data : []);
         } catch (err) {
             console.error('Fetch error:', err);
-            setError(err.message);
+            setError(err.response?.data?.message || err.message || 'Failed to fetch items');
         } finally {
             setLoading(false);
         }
@@ -85,41 +60,17 @@ const ManagementModal = ({
             setLoading(true);
             setError(null);
 
-            const method = modalMode === 'create' ? 'POST' : 'PUT';
-            const url = modalMode === 'create'
-                ? `${API_BASE}/api/${apiBase}`
-                : `${API_BASE}/api/${apiBase}/${currentItem._id}`;
-
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                throw new Error('Authentication required. Please login again.');
-            }
-
-            const res = await fetch(url, {
-                method,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(currentItem)
-            });
-
-            if (!res.ok) {
-                const contentType = res.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    const errData = await res.json();
-                    throw new Error(errData.message || 'Operation failed');
-                } else {
-                    throw new Error(`Server error: ${res.status}`);
-                }
+            if (modalMode === 'create') {
+                await api.post(`/api/${apiBase}`, currentItem);
+            } else {
+                await api.put(`/api/${apiBase}/${currentItem._id}`, currentItem);
             }
 
             setShowModal(false);
             await fetchItems();
         } catch (err) {
             console.error('Save error:', err);
-            setError(err.message);
+            setError(err.response?.data?.message || err.message || 'Operation failed');
         } finally {
             setLoading(false);
         }
@@ -130,34 +81,11 @@ const ManagementModal = ({
 
         try {
             setError(null);
-            const token = localStorage.getItem('token');
-
-            if (!token) {
-                throw new Error('Authentication required. Please login again.');
-            }
-
-            const res = await fetch(`${API_BASE}/api/${apiBase}/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (!res.ok) {
-                const contentType = res.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    const errData = await res.json();
-                    throw new Error(errData.message || 'Delete failed');
-                } else {
-                    throw new Error(`Server error: ${res.status}`);
-                }
-            }
-
+            await api.delete(`/api/${apiBase}/${id}`);
             await fetchItems();
         } catch (err) {
             console.error('Delete error:', err);
-            alert('Delete failed: ' + err.message);
+            alert(err.response?.data?.message || err.message || 'Delete failed');
         }
     };
 

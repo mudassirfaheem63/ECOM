@@ -1,0 +1,34 @@
+PUBLIC PAGES
+
+Home
+Contact us
+about us
+faq
+Categories
+Category Products
+Search Results
+Product Detail
+
+AUTH PAGES
+
+Login
+Register
+Forgot Password
+
+USER Pages
+
+My Profile
+Checkout
+My Wishlist
+My Cart
+My Orders
+
+ADMIN PAGES
+
+Admin Dashboard ()
+Users Management(create/edit/view modal)
+Categories Management(create/edit/view modal)
+Products Management(create/edit/view modal)
+Orders Management(create/edit/view modal)
+Manage Contact us (create/edit/view modal)
+Manage FAQ(create/edit/view modal)

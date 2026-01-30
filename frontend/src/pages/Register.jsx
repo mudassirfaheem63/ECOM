@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useAuth } from '../contexts/Auth';
+import { useAuth } from '../contexts/AuthContext';
 import HeroHeader from '../components/HeroHeader';
 
 function Register() {
@@ -8,12 +8,12 @@ function Register() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    phone: '',
+    address: ''
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const { register } = useAuth();
+  const { register, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,40 +21,53 @@ function Register() {
       ...formData,
       [e.target.id]: e.target.value
     });
+    // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-    setSuccess('');
+
+    // Client-side validation
+    if (!formData.name || !formData.email || !formData.password) {
+      setError('Please fill in all required fields');
+      return;
+    }
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
-      setLoading(false);
       return;
     }
 
     // Validate password length
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters long');
-      setLoading(false);
       return;
     }
 
-    const result = await register(formData.name, formData.email, formData.password);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    const result = await register(
+      formData.name,
+      formData.email,
+      formData.password,
+      formData.phone,
+      formData.address
+    );
 
     if (result.success) {
-      setSuccess(result.message);
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
+      // User is now automatically logged in, navigate to home
+      navigate('/');
     } else {
       setError(result.message);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -82,8 +95,9 @@ function Register() {
                           value={formData.name}
                           onChange={handleChange}
                           required
+                          disabled={loading}
                         />
-                        <label htmlFor="name">Full Name</label>
+                        <label htmlFor="name">Full Name *</label>
                       </div>
                     </div>
                     <div className="col-12">
@@ -96,8 +110,37 @@ function Register() {
                           value={formData.email}
                           onChange={handleChange}
                           required
+                          disabled={loading}
                         />
-                        <label htmlFor="email">Email Address</label>
+                        <label htmlFor="email">Email Address *</label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="form-floating">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="phone"
+                          placeholder="Your Phone"
+                          value={formData.phone}
+                          onChange={handleChange}
+                          disabled={loading}
+                        />
+                        <label htmlFor="phone">Phone Number (Optional)</label>
+                      </div>
+                    </div>
+                    <div className="col-12">
+                      <div className="form-floating">
+                        <input
+                          type="text"
+                          className="form-control"
+                          id="address"
+                          placeholder="Your Address"
+                          value={formData.address}
+                          onChange={handleChange}
+                          disabled={loading}
+                        />
+                        <label htmlFor="address">Address (Optional)</label>
                       </div>
                     </div>
                     <div className="col-12">
@@ -110,8 +153,10 @@ function Register() {
                           value={formData.password}
                           onChange={handleChange}
                           required
+                          disabled={loading}
+                          minLength={6}
                         />
-                        <label htmlFor="password">Password</label>
+                        <label htmlFor="password">Password * (min 6 characters)</label>
                       </div>
                     </div>
                     <div className="col-12">
@@ -124,10 +169,18 @@ function Register() {
                           value={formData.confirmPassword}
                           onChange={handleChange}
                           required
+                          disabled={loading}
                         />
-                        <label htmlFor="confirmPassword">Confirm Password</label>
+                        <label htmlFor="confirmPassword">Confirm Password *</label>
                       </div>
                     </div>
+
+                    {error && (
+                      <div className="col-12">
+                        <div className="alert alert-danger mb-0">{error}</div>
+                      </div>
+                    )}
+
                     <div className="col-12">
                       <button
                         className="btn btn-primary w-100 py-3"
@@ -146,12 +199,6 @@ function Register() {
                       </p>
                     </div>
                   </div>
-                  {error && (
-                    <div className="alert alert-danger mt-3">{error}</div>
-                  )}
-                  {success && (
-                    <div className="alert alert-success mt-3">{success}</div>
-                  )}
                 </form>
               </div>
             </div>

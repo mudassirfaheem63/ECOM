@@ -2,12 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/Auth';
 
-const API_BASE = import.meta.env.VITE_Backend || 'http://localhost:5000';
-
 const ProductsManagement = () => {
-  const { logout } = useAuth();
+  const { api } = useAuth();
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); // for category dropdown
+  const [categories, setCategories] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState(''); // 'create' | 'edit' | 'view'
   const [currentProduct, setCurrentProduct] = useState({
@@ -29,43 +27,13 @@ const ProductsManagement = () => {
     fetchCategories();
   }, []);
 
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Authentication required. Please login again.');
-    }
-    return {
-      'Authorization': `Bearer ${token}`
-    };
-  };
-
-  const handleAuthError = (error) => {
-    if (error.message.includes('Authentication required') || 
-        error.message.includes('Unauthorized') ||
-        error.message.includes('Invalid token')) {
-      logout();
-      window.location.href = '/login';
-    }
-  };
-
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/products/admin/all`, {
-        headers: getAuthHeaders(),
-      });
-
-      if (res.status === 401 || res.status === 403) {
-        handleAuthError(new Error('Unauthorized'));
-        return;
-      }
-
-      if (!res.ok) throw new Error('Failed to load products');
-      const data = await res.json();
-      setProducts(data);
+      const response = await api.get('/api/products/admin/all');
+      setProducts(response.data);
     } catch (err) {
-      setError(err.message);
-      handleAuthError(err);
+      setError(err.response?.data?.message || err.message || 'Failed to load products');
     } finally {
       setLoading(false);
     }
@@ -73,22 +41,10 @@ const ProductsManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/categories/admin/all`, {
-        headers: getAuthHeaders(),
-      });
-
-      if (res.status === 401 || res.status === 403) {
-        handleAuthError(new Error('Unauthorized'));
-        return;
-      }
-
-      if (res.ok) {
-        const data = await res.json();
-        setCategories(data);
-      }
+      const response = await api.get('/api/categories/admin/all');
+      setCategories(response.data);
     } catch (err) {
       console.warn('Categories fetch failed', err);
-      handleAuthError(err);
     }
   };
 
@@ -159,33 +115,24 @@ const ProductsManagement = () => {
         formData.append('images', file);
       });
 
-      const method = modalMode === 'create' ? 'POST' : 'PUT';
-      const url =
-        modalMode === 'create'
-          ? `${API_BASE}/api/products`
-          : `${API_BASE}/api/products/${currentProduct._id}`;
-
-      const res = await fetch(url, {
-        method,
-        headers: getAuthHeaders(),
-        body: formData,
-      });
-
-      if (res.status === 401 || res.status === 403) {
-        handleAuthError(new Error('Unauthorized'));
-        return;
-      }
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.message || 'Save failed');
+      if (modalMode === 'create') {
+        await api.post('/api/products', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+      } else {
+        await api.put(`/api/products/${currentProduct._id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
       }
 
       setModalOpen(false);
       fetchProducts();
     } catch (err) {
-      setError(err.message);
-      handleAuthError(err);
+      setError(err.response?.data?.message || err.message || 'Save failed');
     } finally {
       setLoading(false);
     }
@@ -193,27 +140,17 @@ const ProductsManagement = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this product?')) return;
+    
     try {
-      const res = await fetch(`${API_BASE}/api/products/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders(),
-      });
-
-      if (res.status === 401 || res.status === 403) {
-        handleAuthError(new Error('Unauthorized'));
-        return;
-      }
-
-      if (!res.ok) throw new Error('Delete failed');
+      await api.delete(`/api/products/${id}`);
       fetchProducts();
     } catch (err) {
-      alert('Error: ' + err.message);
-      handleAuthError(err);
+      alert(err.response?.data?.message || err.message || 'Error deleting product');
     }
   };
 
   return (
-     <>
+    <>
       <div className="container-fluid pt-4 px-4">
         <div className="bg-light text-center rounded p-4">
           <div className="d-flex align-items-center justify-content-between mb-4">
@@ -225,7 +162,9 @@ const ProductsManagement = () => {
 
           {loading && (
             <div className="text-center my-5">
-              <div className="spinner-border text-primary" role="status" />
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
             </div>
           )}
 
@@ -236,6 +175,7 @@ const ProductsManagement = () => {
               <table className="table text-start align-middle table-bordered table-hover mb-0">
                 <thead>
                   <tr className="text-dark">
+                    <th>Image</th>
                     <th>Title</th>
                     <th>Price</th>
                     <th>Stock</th>
@@ -247,34 +187,34 @@ const ProductsManagement = () => {
                 <tbody>
                   {products.map((p) => (
                     <tr key={p._id}>
+                      <td>
+                        {p.images && p.images.length > 0 ? (
+                          <img
+                            src={p.images[0]}
+                            alt={p.title}
+                            style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }}
+                          />
+                        ) : (
+                          <div style={{ width: '60px', height: '60px', background: '#eee', borderRadius: '4px' }} />
+                        )}
+                      </td>
                       <td>{p.title}</td>
-                      <td>₨ {Number(p.price).toLocaleString()}</td>
+                      <td>₨ {p.price?.toLocaleString()}</td>
                       <td>{p.stock}</td>
                       <td>{p.category?.name || '-'}</td>
                       <td>
-                        <span
-                          className={`badge ${p.isActive ? 'bg-success' : 'bg-danger'}`}
-                        >
+                        <span className={`badge ${p.isActive ? 'bg-success' : 'bg-danger'}`}>
                           {p.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-info me-1"
-                          onClick={() => openModal('view', p)}
-                        >
+                        <button className="btn btn-sm btn-info me-1" onClick={() => openModal('view', p)}>
                           View
                         </button>
-                        <button
-                          className="btn btn-sm btn-warning me-1"
-                          onClick={() => openModal('edit', p)}
-                        >
+                        <button className="btn btn-sm btn-warning me-1" onClick={() => openModal('edit', p)}>
                           Edit
                         </button>
-                        <button
-                          className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(p._id)}
-                        >
+                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(p._id)}>
                           Delete
                         </button>
                       </td>
