@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom"
 import  useInjectedAssets from "../../hooks/useInjectedAssets";    
 import Footer from "./Footer"
 import Header from "./Header"
-import Sidebar from "./sidebar"
+import Sidebar from "./Sidebar"
 
 
 function DashboardLayout() {

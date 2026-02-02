@@ -1,6 +1,6 @@
 // src/components/ManagementModal.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/Auth';
+import { useAuth } from '../contexts/AuthContext';
 
 const ManagementModal = ({
     title,

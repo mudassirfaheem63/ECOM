@@ -5,15 +5,15 @@ import Home from "./pages/Home"
 import AboutUs from "./pages/AboutUs"
 import ContactUs from "./pages/ContactUs"
 import HowToUse from "./pages/HowToUse"
-import Testimonial from "./pages/testimonal"
-import Feature from "./pages/feature"
-import Blog from "./pages/blog"
+import Testimonial from "./pages/Testimonal"
+import Feature from "./pages/Feature"
+import Blog from "./pages/Blog"
 import Error404 from "./pages/404"
-import Product from "./pages/product"
+import Product from "./pages/Product"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
 import DashboardLayout from './components/dashboard/Layout';
-import ProductsManagement from './pages/Management/ProductsMnanagement'
+import ProductsManagement from './pages/Management/ProductsManagement'
 import CategoriesManagement from './pages/Management/CategoriesManagement'
 import OrdersManagement from './pages/Management/OrdersManagement'
 import UsersManagement from './pages/Management/UsersManagement'
@@ -39,16 +39,18 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
           </Route>
-          <Route path="/" element={<DashboardLayout />} >
+          <Route path="/" element={
             <ProtectedRoute requireAdmin>
-            <Route path="dashboard/*" element={<div>Dashboard Home</div>} />
+              <DashboardLayout />
+            </ProtectedRoute>
+          }>
+            <Route index element={<div>Dashboard Home</div>} />
             <Route path="managementcategories" element={<CategoriesManagement />} />
             <Route path="managementproducts" element={<ProductsManagement />} />
             <Route path="managementorders" element={<OrdersManagement />} />
             <Route path="managementusers" element={<UsersManagement />} />
             <Route path="managementcontact" element={<ContactsManagement />} />
             <Route path="managementfaq" element={<FAQsManagement />} />
-            </ProtectedRoute>
           </Route>
         </Routes>
       </Router>

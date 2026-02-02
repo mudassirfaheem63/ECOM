@@ -1,0 +1,19 @@
+USER FUNCTIONS
+Register 
+Login
+Logout
+Password Forgotten
+Reset Password
+Update Profile
+Delete Account
+Change Role
+
+CRUD FUNCTIONS 
+CRUD User
+CRUD Category
+CRUD Product 
+CRUD Cart
+CRUD Orders
+CRUD Wishlist 
+CRUD Contact
+CRUD FAQ

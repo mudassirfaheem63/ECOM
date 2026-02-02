@@ -1,6 +1,6 @@
 // src/pages/admin/ProductsManagement.jsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/Auth';
+import { useAuth } from '../../contexts/AuthContext';
 
 const ProductsManagement = () => {
   const { api } = useAuth();
@@ -31,7 +31,7 @@ const ProductsManagement = () => {
     try {
       setLoading(true);
       const response = await api.get('/api/products/admin/all');
-      setProducts(response.data);
+      setProducts(response.data.products || []);
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to load products');
     } finally {
