@@ -17,3 +17,7 @@ CRUD Orders
 CRUD Wishlist 
 CRUD Contact
 CRUD FAQ
+
+METHODS
+get all
+get by id/User

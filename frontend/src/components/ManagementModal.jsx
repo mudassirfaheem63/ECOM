@@ -10,7 +10,7 @@ const ManagementModal = ({
     renderTableRow,
     extraModalContent = null,
 }) => {
-    const { api } = useAuth();
+    const { api, isAuthenticated, isAdmin, user } = useAuth();
     const [items, setItems] = useState([]);
     const [modalMode, setModalMode] = useState(null); // 'create' | 'edit' | 'view'
     const [currentItem, setCurrentItem] = useState(null);
@@ -19,27 +19,91 @@ const ManagementModal = ({
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        // Check if user is authenticated and has admin privileges
+        if (!isAuthenticated) {
+            setError('You must be logged in to access this feature.');
+            return;
+        }
+        
+        if (!isAdmin()) {
+            setError('You must be an admin to access this feature.');
+            return;
+        }
+
         fetchItems();
-    }, []);
+    }, [isAuthenticated, user]);
 
     const fetchItems = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            // Construct the URL based on apiBase
+            // Construct the URL based on apiBase following the backend route patterns
             let endpoint = `/api/${apiBase}`;
 
-            // Add /admin/all for endpoints that have it, except 'auth'
+            // Admin endpoints follow different patterns based on the resource:
+            // - products: /api/products/all (paginated)
+            // - categories: /api/categories/all (paginated)
+            // - faq: /api/faq (public) vs /api/faq/all (admin)
+            // - contact: /api/contact (array)
+            // - orders: /api/orders/all (paginated)
+            // - users: /api/auth (array)
+            
             if (apiBase !== 'auth') {
-                endpoint += '/admin/all';
+                if (apiBase === 'products' || apiBase === 'categories' || apiBase === 'orders') {
+                    // These endpoints use /all and return paginated responses
+                    endpoint += '/all';
+                } else if (apiBase === 'faq') {
+                    // For FAQ, use admin endpoint for management
+                    endpoint += '/all';
+                }
+                // wishlist and cart don't have admin endpoints
             }
 
             const response = await api.get(endpoint);
-            setItems(Array.isArray(response.data) ? response.data : []);
+            
+            // Handle different response formats based on the API structure
+            if (Array.isArray(response.data)) {
+                setItems(response.data);
+            } else if (response.data && Array.isArray(response.data.products)) {
+                // Handle paginated response for products
+                setItems(response.data.products);
+            } else if (response.data && Array.isArray(response.data.categories)) {
+                // Handle paginated response for categories
+                setItems(response.data.categories);
+            } else if (response.data && Array.isArray(response.data.orders)) {
+                // Handle paginated response for orders
+                setItems(response.data.orders);
+            } else if (response.data && Array.isArray(response.data.users)) {
+                // Handle array response for users
+                setItems(response.data.users);
+            } else if (response.data && Array.isArray(response.data.contacts)) {
+                // Handle array response for contacts
+                setItems(response.data.contacts);
+            } else if (response.data && Array.isArray(response.data.faqs)) {
+                // Handle array response for faqs
+                setItems(response.data.faqs);
+            } else {
+                setItems([]);
+            }
         } catch (err) {
             console.error('Fetch error:', err);
-            setError(err.response?.data?.message || err.message || 'Failed to fetch items');
+            
+            // Provide more specific error messages
+            if (err.response?.status === 401) {
+                setError('Authentication required. Please log in as an admin.');
+                // Clear auth state if token is invalid
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            } else if (err.response?.status === 403) {
+                setError('Access denied. You need admin privileges to access this feature.');
+            } else if (err.response?.status === 404) {
+                setError('API endpoint not found. Please check if the server is running.');
+            } else if (err.response?.status === 500) {
+                setError('Server error. Please check if the backend server is running and the database is connected.');
+            } else {
+                setError(err.response?.data?.message || err.message || 'Failed to fetch items');
+            }
         } finally {
             setLoading(false);
         }
@@ -70,7 +134,20 @@ const ManagementModal = ({
             await fetchItems();
         } catch (err) {
             console.error('Save error:', err);
-            setError(err.response?.data?.message || err.message || 'Operation failed');
+            
+            // Provide more specific error messages
+            if (err.response?.status === 401) {
+                setError('Authentication required. Please log in as an admin.');
+                // Clear auth state if token is invalid
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            } else if (err.response?.status === 403) {
+                setError('Access denied. You need admin privileges to perform this action.');
+            } else if (err.response?.status === 500) {
+                setError('Server error. Please check if the backend server is running and the database is connected.');
+            } else {
+                setError(err.response?.data?.message || err.message || 'Operation failed');
+            }
         } finally {
             setLoading(false);
         }
@@ -85,7 +162,20 @@ const ManagementModal = ({
             await fetchItems();
         } catch (err) {
             console.error('Delete error:', err);
-            alert(err.response?.data?.message || err.message || 'Delete failed');
+            
+            // Provide more specific error messages
+            if (err.response?.status === 401) {
+                alert('Authentication required. Please log in as an admin.');
+                // Clear auth state if token is invalid
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            } else if (err.response?.status === 403) {
+                alert('Access denied. You need admin privileges to perform this action.');
+            } else if (err.response?.status === 500) {
+                alert('Server error. Please check if the backend server is running and the database is connected.');
+            } else {
+                alert(err.response?.data?.message || err.message || 'Delete failed');
+            }
         }
     };
 

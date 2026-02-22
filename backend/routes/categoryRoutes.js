@@ -12,15 +12,21 @@ import { authenticate, authorize } from '../middlewares/auth.js';
 
 const router = express.Router();
 
-// Public routes
-router.get('/', getCategories);              // Get active categories
-router.get('/:id', getCategory);             // Get single category
+// ============================================
+// IMPORTANT: Specific routes BEFORE parameterized routes!
+// ============================================
 
-// Admin only routes
+// Public routes - NON-parameterized first
+router.get('/', getCategories);              // Get active categories
+
+// Admin only routes - Specific paths BEFORE /:id
 router.post('/', authenticate, authorize('admin'), createCategory);       // Create category
-router.get('/admin/all', authenticate, authorize('admin'), getAllCategories); // Get all categories
-router.put('/:id', authenticate, authorize('admin'), updateCategory);     // Update category
+router.get('/all', authenticate, authorize('admin'), getAllCategories); // Get all categories - ✅ BEFORE /:id
 router.patch('/:id/toggle', authenticate, authorize('admin'), toggleCategory); // Toggle status
+router.put('/:id', authenticate, authorize('admin'), updateCategory);     // Update category
 router.delete('/:id', authenticate, authorize('admin'), deleteCategory);  // Delete category
+
+// Parameterized routes LAST
+router.get('/:id', getCategory);             // Get single category - ✅ MUST BE LAST
 
 export default router;

@@ -46,7 +46,7 @@ const OrdersManagement = () => {
   return (
     <ManagementModal
       title="Orders Management"
-      apiBase="orders/admin"
+      apiBase="orders"
       fields={fields}
       defaultItem={defaultItem}
       renderTableRow={renderTableRow}

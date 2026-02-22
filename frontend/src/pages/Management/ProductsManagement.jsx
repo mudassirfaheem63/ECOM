@@ -30,8 +30,16 @@ const ProductsManagement = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/api/products/admin/all');
-      setProducts(response.data.products || []);
+      const response = await api.get('/api/products/all');
+      
+      // Handle paginated response from products API
+      if (response.data && Array.isArray(response.data.products)) {
+        setProducts(response.data.products);
+      } else if (Array.isArray(response.data)) {
+        setProducts(response.data);
+      } else {
+        setProducts([]);
+      }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to load products');
     } finally {
@@ -41,7 +49,7 @@ const ProductsManagement = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await api.get('/api/categories/admin/all');
+      const response = await api.get('/api/categories/all');
       setCategories(response.data);
     } catch (err) {
       console.warn('Categories fetch failed', err);
